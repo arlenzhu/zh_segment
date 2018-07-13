@@ -13,8 +13,8 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, TensorBoard
 
 
-MAX_LEN = 399
-VOCAB_SIZE = 5128
+MAX_LEN = 50
+VOCAB_SIZE = 5033
 EMBEDDING_OUT_DIM = 64
 HIDDEN_UNITS = 200
 DROPOUT_RATE = 0.3
@@ -25,11 +25,11 @@ def bigru_crf_model():
     model = Sequential()
     model.add(Embedding(VOCAB_SIZE + 1, EMBEDDING_OUT_DIM, mask_zero=True))  # Random embedding
     model.add(Bidirectional(GRU(HIDDEN_UNITS // 2, return_sequences=True)))
-    model.add(TimeDistributed(Dense(NUM_CLASS)))
-    crf = CRF(NUM_CLASS, sparse_target=True)
-    model.add(crf)
+    model.add(TimeDistributed(Dense(NUM_CLASS, activation='softmax')))
+    # crf = CRF(NUM_CLASS, sparse_target=True)
+    # model.add(crf)
     model.summary()
-    model.compile('adam', loss=crf.loss_function, metrics=[crf.accuracy])
+    model.compile(optimizer=Adam(), loss='categorical_crossentropy', metrics=['accuracy'])
     return model
 
 
